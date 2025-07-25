@@ -120,7 +120,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
 
 void MainWindow::new_document(){
     edit_text->clear();//clearing the text edit to simulate new doc created
-    /*TODO: I need to implement a more elaborative approach on this
+
+    /*  TODO: I need to implement a more elaborative approach on this
      a system where a new window with a new text edit appears*/
 }
 
@@ -177,7 +178,7 @@ void MainWindow::save_document(){
 }
 
 void MainWindow::show_info(){
-    QMessageBox::information(this, "About me","This is the very first C++ GUI application in Project 91E. I am exhilarated!");
+    QMessageBox::information(this, "About me","This is the very first complete C++ GUI application in Project 91E. I am exhilarated!");
 }
 
 
