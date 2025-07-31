@@ -38,8 +38,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
 
 
     //New Document
-    new_action = new QAction();
-    MainWindow::action_func(file_menu, new_action,"&New","New");
+    new_action = code_lib->action_handler(file_menu, "&New","New");
 
     //Save Document
     save_action = new QAction();

@@ -22,11 +22,10 @@ class CodeLibrary: public QObject
 public:
     explicit CodeLibrary(QObject * parent = nullptr, MainWindow * main_window = nullptr);
     void new_document();
-    // void open_document();
-    // void save_document();
+    void save_document();
     void save_document_as();
     void open_document();
-    void action_func(QAction * action, QMenu * menu_bar, QString &menu_item,QString&status_tip);
+    QAction* action_handler(QMenu * menu_bar, const QString &menu_item, const QString&status_tip);
 
 private:
     MainWindow * m_main_window;
