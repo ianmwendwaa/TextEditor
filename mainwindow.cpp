@@ -96,78 +96,11 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
     about_menu = menu_bar->addMenu("&About");
 
     //info popup
-    info = about_menu->addAction("&Info");
-    info->setStatusTip("Info");
-    QObject::connect(info, &QAction::triggered, this, &MainWindow::show_info);
+    info = code_lib->action_handler(about_menu,"&Info","Info");
 }
 
 QTextEdit *MainWindow::getTextEdit() const{
     return edit_text;
 }
-
-void MainWindow::new_document(){
-    edit_text->clear();//clearing the text edit to simulate new doc created
-
-    /*  TODO: I need to implement a more elaborative approach on this
-     a system where a new window with a new text edit appears*/
-}
-
-void MainWindow::open_document(){
-    QString file_path = QFileDialog::getOpenFileName(this, "Open Document","","*.doc *.txt *.docx");//storing file path as a QString
-
-    //checking if the file is empty or not, if it is not, perform the file opening
-    if(!file_path.isEmpty()){
-        QFile file(file_path);
-        if(!file.open(QIODevice::ReadOnly|QIODevice::Text)){
-            QMessageBox::critical(this,"Error: ",""+ file.errorString());//throws an error as it returns false
-            return;
-        }
-        //getting the data from file
-        QTextStream data_in(&file);
-        QString content = data_in.readAll();//reading the files content
-
-        //closing the file as the contents have already been obtained
-        file.close();
-
-        //checking if the widget has been initialized to prevent runtime error
-        if(edit_text){
-            edit_text->setPlainText(content);
-            setWindowTitle(QFileInfo(file_path).fileName());//set window title as name of the document
-        }else{
-            QMessageBox::critical(this, "Widget accessed is a null pointer","");
-        }
-    }
-}
-
-void MainWindow::save_document(){
-    QString file_path = QFileDialog::getSaveFileName(this, "Save Document","C:/Documents", "*.txt");
-
-    if(file_path.isEmpty()){
-        QMessageBox::critical(this, "Error","Enter text file's title!");
-        return;
-    }
-
-    QFile file(file_path);
-
-    if(!file.open(QIODevice::Text|QIODevice::WriteOnly|QIODevice::Truncate)){
-        QMessageBox::critical(this, "Error saving document!","");
-        return;
-    }
-    //packaging the contents of the file
-    QTextStream data_out(&file);
-
-    //passing the content to be saved
-    data_out<<edit_text->toPlainText();
-
-    file.close();//closing the file to save on resources and stuff
-
-    setWindowTitle(QFileInfo(file_path).fileName());//get and set the window title as the title of the document
-}
-
-
-void MainWindow::show_info(){
-    QMessageBox::information(this, "About me","This is the very first complete C++ GUI application in Project 91E. I am exhilarated!");
-}
-
 
 

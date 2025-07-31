@@ -28,10 +28,14 @@ public:
     void show_info();
     void page_setup();
     void print_doc();
+
+    void display_msg_dialog(const QString &event_result,const QString &dialog_msg);
     QAction* action_handler(QMenu * menu_bar, const QString &menu_item, const QString&status_tip);
 
 private:
     MainWindow * m_main_window;
+    QTextEdit * txt_edit;
+    QString curr_file_path;
 };
 
 
