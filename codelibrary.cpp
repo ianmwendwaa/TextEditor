@@ -89,3 +89,14 @@ void CodeLibrary::save_document(){
 void CodeLibrary::open_document(){
 
 }
+
+void CodeLibrary::show_info(){
+
+}
+
+void CodeLibrary::page_setup(){
+
+}
+void CodeLibrary::print_doc(){
+
+}

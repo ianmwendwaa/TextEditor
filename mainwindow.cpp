@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "codelibrary.h"
-#include <map>
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -41,42 +40,13 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
     new_action = code_lib->action_handler(file_menu, "&New","New");
 
     //Save Document
-    save_action = new QAction();
-    MainWindow::action_func(file_menu, save_action, "&Save", "Save");
+    save_action = code_lib->action_handler(file_menu,"&Save","Save");
 
-    save_as_action = new QAction();
-    MainWindow::action_func(file_menu, save_as_action, "&Save As", "Save As");
+    save_as_action = code_lib->action_handler(file_menu,"&Save As", "Save As");
 
-    open_action = new QAction();
-    MainWindow::action_func(file_menu, open_action, "&Open", "Open");
+    open_action = code_lib->action_handler(file_menu,"&Open","Open");
 
-    exit_program = new QAction();
-    MainWindow::action_func(file_menu, exit_program, "&Exit", "Exit");
-
-
-    save_action = file_menu->addAction("&Save");
-    save_action->setShortcut(QKeySequence::Save);
-    save_action->setStatusTip("Save Document");
-    QObject::connect(save_action, &QAction::triggered, this, &MainWindow::save_document);
-
-    //Save As
-    save_as_action = file_menu->addAction("&Save As");
-    save_as_action->setShortcut(QKeySequence::SaveAs);
-    save_as_action->setStatusTip("Save As");
-
-    //Open Document
-    open_action = file_menu->addAction("&Open");
-    open_action->setShortcut(QKeySequence::Open);
-    open_action->setStatusTip("Open Document");
-
-    QObject::connect(open_action, &QAction::triggered, this, &MainWindow::open_document);
-
-    //Exit
-    exit_program = file_menu->addAction("&Exit");
-    exit_program->setShortcut(QKeySequence::Quit);
-    exit_program->setStatusTip("Exit");
-    QObject::connect(exit_program, &QAction::triggered, this, &QApplication::quit);
-
+    exit_program = code_lib->action_handler(file_menu,"&Quit","Exit");
 
     //<--------------------Edit menu----------------------->
     edit_menu = menu_bar->addMenu("&Edit");
@@ -133,48 +103,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
 
 QTextEdit *MainWindow::getTextEdit() const{
     return edit_text;
-}
-
-enum ActionTypes{
-    NEW, SAVE, SAVE_AS, OPEN,
-    EXIT, UNDO, REDO, PASTE,
-    CUT, COPY, PRINT, PAGE_SETUP, ABOUT, INFO, UNKNOWN_CMD
-
-};
-void MainWindow::action_func(QMenu *menu, QAction * action,
-                             const QString &menu_ation_name, const QString &status_tip){
-    action = menu->addAction(menu_ation_name);
-
-    std::map<QString, ActionTypes> action_map;
-
-    action_map["New"] = NEW;
-    action_map["Save"] = SAVE;
-    action_map["save_as"] = SAVE_AS;
-
-    QString action_input = status_tip;
-    ActionTypes cmd = UNKNOWN_CMD;
-    if(action_map.count(action_input)){
-        cmd = action_map[action_input];
-    }
-
-    switch (cmd) {
-    case NEW:
-        action->setShortcut(QKeySequence::New);
-        QObject::connect(action, &QAction::triggered, code_lib, &CodeLibrary::new_document);
-        break;
-    case SAVE:
-        action->setShortcut(QKeySequence::Save);
-        QObject::connect(action, &QAction::triggered, this, &MainWindow::save_document);
-    case SAVE_AS:
-        action->setShortcut(QKeySequence::SaveAs);
-        QObject::connect(action, &QAction::triggered, code_lib, &CodeLibrary::save_document_as);
-    default:
-        break;
-    }
-
-    action->setStatusTip(status_tip);
-
-
 }
 
 void MainWindow::new_document(){

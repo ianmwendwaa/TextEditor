@@ -25,6 +25,9 @@ public:
     void save_document();
     void save_document_as();
     void open_document();
+    void show_info();
+    void page_setup();
+    void print_doc();
     QAction* action_handler(QMenu * menu_bar, const QString &menu_item, const QString&status_tip);
 
 private:
