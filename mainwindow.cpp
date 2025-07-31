@@ -1,14 +1,18 @@
 #include "mainwindow.h"
+#include "codelibrary.h"
+#include <map>
+
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QFile>
 #include <QTextEdit>
 #include <QApplication>
 
-
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
     menu_bar = menuBar();
     resize(600,400);
+
+    code_lib = new CodeLibrary(this,this);
 
     edit_text = new QTextEdit();
 
@@ -34,13 +38,23 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
 
 
     //New Document
-    new_action = file_menu->addAction("&New");
-    new_action->setShortcut(QKeySequence::New);
-    new_action->setStatusTip("New");
-
-    QObject::connect(new_action, &QAction::triggered, this, &MainWindow::new_document);
+    new_action = new QAction();
+    MainWindow::action_func(file_menu, new_action,"&New","New");
 
     //Save Document
+    save_action = new QAction();
+    MainWindow::action_func(file_menu, save_action, "&Save", "Save");
+
+    save_as_action = new QAction();
+    MainWindow::action_func(file_menu, save_as_action, "&Save As", "Save As");
+
+    open_action = new QAction();
+    MainWindow::action_func(file_menu, open_action, "&Open", "Open");
+
+    exit_program = new QAction();
+    MainWindow::action_func(file_menu, exit_program, "&Exit", "Exit");
+
+
     save_action = file_menu->addAction("&Save");
     save_action->setShortcut(QKeySequence::Save);
     save_action->setStatusTip("Save Document");
@@ -118,6 +132,52 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
     QObject::connect(info, &QAction::triggered, this, &MainWindow::show_info);
 }
 
+QTextEdit *MainWindow::getTextEdit() const{
+    return edit_text;
+}
+
+enum ActionTypes{
+    NEW, SAVE, SAVE_AS, OPEN,
+    EXIT, UNDO, REDO, PASTE,
+    CUT, COPY, PRINT, PAGE_SETUP, ABOUT, INFO, UNKNOWN_CMD
+
+};
+void MainWindow::action_func(QMenu *menu, QAction * action,
+                             const QString &menu_ation_name, const QString &status_tip){
+    action = menu->addAction(menu_ation_name);
+
+    std::map<QString, ActionTypes> action_map;
+
+    action_map["New"] = NEW;
+    action_map["Save"] = SAVE;
+    action_map["save_as"] = SAVE_AS;
+
+    QString action_input = status_tip;
+    ActionTypes cmd = UNKNOWN_CMD;
+    if(action_map.count(action_input)){
+        cmd = action_map[action_input];
+    }
+
+    switch (cmd) {
+    case NEW:
+        action->setShortcut(QKeySequence::New);
+        QObject::connect(action, &QAction::triggered, code_lib, &CodeLibrary::new_document);
+        break;
+    case SAVE:
+        action->setShortcut(QKeySequence::Save);
+        QObject::connect(action, &QAction::triggered, this, &MainWindow::save_document);
+    case SAVE_AS:
+        action->setShortcut(QKeySequence::SaveAs);
+        QObject::connect(action, &QAction::triggered, code_lib, &CodeLibrary::save_document_as);
+    default:
+        break;
+    }
+
+    action->setStatusTip(status_tip);
+
+
+}
+
 void MainWindow::new_document(){
     edit_text->clear();//clearing the text edit to simulate new doc created
 
@@ -176,6 +236,7 @@ void MainWindow::save_document(){
 
     setWindowTitle(QFileInfo(file_path).fileName());//get and set the window title as the title of the document
 }
+
 
 void MainWindow::show_info(){
     QMessageBox::information(this, "About me","This is the very first complete C++ GUI application in Project 91E. I am exhilarated!");

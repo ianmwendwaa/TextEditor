@@ -1,6 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-
+#include "codelibrary.h"
 #include <QMainWindow>
 #include <QAction>
 #include <QToolBar>
@@ -25,19 +25,25 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
+    QTextEdit * getTextEdit()const;
+
 private:
     Ui::MainWindow *ui;
+
+    CodeLibrary * code_lib;
+
 
     QMenuBar * menu_bar;//main menu bar
 
     QToolBar * tool_bar;
+
+    QTextEdit * edit_text;
 
     QMenu * file_menu;//file menu
     QMenu * edit_menu;//edit menu
     QMenu * page_menu;
     QMenu * about_menu;//about menu
 
-    QTextEdit * edit_text;
 
 
     //self explanatory actions
@@ -58,12 +64,15 @@ private:
 
     QAction * info;
 
-    QString m_currentFilePath;//this one will store the current path for the current document
+    QString m_currentFilePath;//this one will store the current path for the current document'
+
+    void action_func(QMenu * menu, QAction *action, const QString &menu_ation_name, const QString &status_tip);
 
     void new_document();
     void open_document();
 
     void save_document();
+    void save_document_as();
 
     void undo_text();
 
