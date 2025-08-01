@@ -19,7 +19,7 @@ enum ActionTypes{
     NEW, SAVE, SAVE_AS, OPEN,
     EXIT, UNDO, REDO, PASTE,
     CUT, COPY, PRINT, PAGE_SETUP,
-    ABOUT, INFO, UNKNOWN_CMD
+    ABOUT, INFO, INCREASE_FNT_SZ, DECREASE_FNT_SZ, ITALICS, BOLD, UNDERLINE, UNKNOWN_CMD
 };
 
 //results from process execution
@@ -28,7 +28,15 @@ enum ProcessResult{
 };
 
 CodeLibrary::CodeLibrary(QObject * parent, MainWindow * main_window): QObject(parent), m_main_window(main_window) {
-    txt_edit = m_main_window->getTextEdit();
+    if(m_main_window){
+        txt_edit = m_main_window->getTextEdit();
+        if(!txt_edit){
+            qWarning()<<"Text Edit is null";
+        }
+    }else{
+        qWarning()<<"Null Window!";
+    }
+
 }
 
 QAction* CodeLibrary::action_handler(QMenu * menu_bar, const QString &menu_item, const QString &status_tip){
@@ -37,9 +45,11 @@ QAction* CodeLibrary::action_handler(QMenu * menu_bar, const QString &menu_item,
 
     static QMap<QString, ActionTypes> action_maps = {
         {"New", NEW},{"Save", SAVE},{"Save As", SAVE_AS},
-        {"Open", OPEN},{"Exit",EXIT},{"Undo", UNDO},{"Redo",REDO},
-        {"Paste",PASTE},{"Cut", CUT},{"Copy", COPY},{"Print",PRINT},
-        {"Page Setup", PAGE_SETUP},{"About", ABOUT},{"Info",INFO}};
+        {"Open", OPEN},{"Exit", EXIT},{"Undo", UNDO},{"Redo",REDO},
+        {"Paste", PASTE},{"Cut", CUT},{"Copy", COPY},{"Print",PRINT},
+        {"Page Setup", PAGE_SETUP},{"About", ABOUT},{"Info", INFO},
+        {"Increase Font", INCREASE_FNT_SZ},{"Decrease Font", DECREASE_FNT_SZ},
+        {"Italics", ITALICS},{"Bold", BOLD},{"Underline", UNDERLINE}};
 
     QString menu_input = status_tip;
     ActionTypes cmd = UNKNOWN_CMD;
@@ -74,25 +84,106 @@ QAction* CodeLibrary::action_handler(QMenu * menu_bar, const QString &menu_item,
         break;
     case INFO:
         QObject::connect(action, &QAction::triggered, this, &CodeLibrary::show_info);
+        break;
     case CUT:
         action->setShortcut(QKeySequence::Cut);
         QObject::connect(action, &QAction::triggered, txt_edit, &QTextEdit::cut);
+        break;
     case COPY:
         action->setShortcut(QKeySequence::Copy);
         QObject::connect(action, &QAction::triggered, txt_edit, &QTextEdit::copy);
+        break;
     case PASTE:
         action->setShortcut(QKeySequence::Paste);
         QObject::connect(action, &QAction::triggered, txt_edit, &QTextEdit::paste);
+        break;
     case UNDO:
         action->setShortcut(QKeySequence::Undo);
         QObject::connect(action, &QAction::triggered, txt_edit, &QTextEdit::undo);
+        break;
     case REDO:
         action->setShortcut(QKeySequence::Redo);
         QObject::connect(action, &QAction::triggered, txt_edit, &QTextEdit::redo);
+        break;
+    case INCREASE_FNT_SZ:
+        action->setShortcut(QKeySequence("CTRL++"));
+        QObject::connect(action, &QAction::triggered, this, &CodeLibrary::increase_font);
+        break;
+    case DECREASE_FNT_SZ:
+        action->setShortcut(QKeySequence("CTRL+-"));
+        QObject::connect(action, &QAction::triggered, this, &CodeLibrary::decrease_font);
+        break;
+    case ITALICS:
+        action->setShortcut(QKeySequence("CTRL+I"));
+        QObject::connect(action, &QAction::triggered, this, &CodeLibrary::toggle_italics);
+    case BOLD:
+        action->setShortcut(QKeySequence("CTRL+B"));
+        QObject::connect(action, &QAction::triggered, this, &CodeLibrary::toggle_bold);
     default:
         break;
     }
     return action;
+}
+
+void CodeLibrary::increase_font(){
+    QTextEdit * txt_edit = m_main_window->getTextEdit();
+
+    QFont font = txt_edit->font();
+    int curr_size = font.pointSize();
+    font.setPointSize(curr_size+1);
+    txt_edit->setFont(font);
+
+}
+
+void CodeLibrary::decrease_font(){
+    QTextEdit * txt_edit = m_main_window->getTextEdit();
+    QFont font = txt_edit->font();
+
+    int curr_size = font.pointSize();
+    font.setPointSize(curr_size-1);
+    txt_edit->setFont(font);
+}
+
+void CodeLibrary::toggle_italics(){
+    QTextEdit * txt_edit = m_main_window->getTextEdit();
+
+    QTextCharFormat char_fmt;
+    char_fmt.setFontItalic(!txt_edit->fontItalic());
+
+    QTextCursor cursor = txt_edit->textCursor();
+    cursor.mergeCharFormat(char_fmt);
+
+    txt_edit->mergeCurrentCharFormat(char_fmt);
+}
+
+void CodeLibrary::toggle_bold(){
+    QTextEdit * txt_edit = m_main_window->getTextEdit();
+
+    int currWeight = txt_edit->fontWeight();
+
+    QTextCharFormat fmt;
+
+    if(currWeight > QFont::Normal){
+        fmt.setFontWeight(QFont::Normal);
+    }else{
+        fmt.setFontWeight(QFont::Bold);
+    }
+
+    QTextCursor cursor = txt_edit->textCursor();
+    cursor.mergeCharFormat(fmt);
+    txt_edit->mergeCurrentCharFormat(fmt);
+}
+
+void CodeLibrary::toggle_underline(){
+    bool isUnderlined = txt_edit->fontUnderline();
+    QTextEdit * txt_edit = m_main_window->getTextEdit();
+
+    QTextCharFormat fmt;
+    fmt.setFontUnderline(!isUnderlined);
+
+    QTextCursor cursor = txt_edit->textCursor();
+    cursor.mergeCharFormat(fmt);
+    txt_edit->mergeCurrentCharFormat(fmt);
 }
 
 void CodeLibrary::new_document(){

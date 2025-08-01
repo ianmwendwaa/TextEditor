@@ -55,6 +55,8 @@ private:
     QAction * copy_action;
     QAction * undo_action;
     QAction * redo_action;
+    QAction * increase_font;
+    QAction * decrease_font;
     QAction * paste_action;
     QAction * open_action;
     QAction * open;

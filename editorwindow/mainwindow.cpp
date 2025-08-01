@@ -59,6 +59,12 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
     //redo operation
     redo_action = code_lib->action_handler(edit_menu,"&Redo","Redo");
 
+    //increase font operation
+    increase_font = code_lib->action_handler(edit_menu,"&Increase Font Size","Increase Font");
+
+    //decrease font operation
+    decrease_font = code_lib->action_handler(edit_menu,"&Decrease Font Size","Decrease Font");
+
     //<---------------------Page Menu----------------------->
     page_menu = menu_bar->addMenu("&Page");
 
