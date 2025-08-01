@@ -25,6 +25,7 @@ public:
     void save_document();
     void save_document_as();
     void open_document();
+    void cut_text();
     void show_info();
     void page_setup();
     void print_doc();

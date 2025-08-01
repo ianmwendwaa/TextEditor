@@ -21,6 +21,7 @@ enum ActionTypes{
     CUT, COPY, PRINT, PAGE_SETUP,
     ABOUT, INFO, UNKNOWN_CMD
 };
+
 //results from process execution
 enum ProcessResult{
     SUCCESS, FAILURE, PERMISSION_DENIED, INFORMATION, UNKNOWN_ERROR
@@ -31,8 +32,9 @@ CodeLibrary::CodeLibrary(QObject * parent, MainWindow * main_window): QObject(pa
 }
 
 QAction* CodeLibrary::action_handler(QMenu * menu_bar, const QString &menu_item, const QString &status_tip){
-    QAction * action = menu_bar->addAction(menu_item);/*adding the action to the menu specified-> I realised that if you
-    dont, it throws an error*/
+    QAction * action = menu_bar->addAction(menu_item);
+    QTextEdit * txt_edit = m_main_window->getTextEdit();
+
     static QMap<QString, ActionTypes> action_maps = {
         {"New", NEW},{"Save", SAVE},{"Save As", SAVE_AS},
         {"Open", OPEN},{"Exit",EXIT},{"Undo", UNDO},{"Redo",REDO},
@@ -72,6 +74,21 @@ QAction* CodeLibrary::action_handler(QMenu * menu_bar, const QString &menu_item,
         break;
     case INFO:
         QObject::connect(action, &QAction::triggered, this, &CodeLibrary::show_info);
+    case CUT:
+        action->setShortcut(QKeySequence::Cut);
+        QObject::connect(action, &QAction::triggered, txt_edit, &QTextEdit::cut);
+    case COPY:
+        action->setShortcut(QKeySequence::Copy);
+        QObject::connect(action, &QAction::triggered, txt_edit, &QTextEdit::copy);
+    case PASTE:
+        action->setShortcut(QKeySequence::Paste);
+        QObject::connect(action, &QAction::triggered, txt_edit, &QTextEdit::paste);
+    case UNDO:
+        action->setShortcut(QKeySequence::Undo);
+        QObject::connect(action, &QAction::triggered, txt_edit, &QTextEdit::undo);
+    case REDO:
+        action->setShortcut(QKeySequence::Redo);
+        QObject::connect(action, &QAction::triggered, txt_edit, &QTextEdit::redo);
     default:
         break;
     }
@@ -92,44 +109,52 @@ void CodeLibrary::new_document(){
 void CodeLibrary::save_document_as(){
     QString file_path = QFileDialog::getSaveFileName(m_main_window,"Save Document","C:/Documents","*.txt");
 
-    if(!file_path.isEmpty()){
-        QFile file(file_path);
-        if(!file.open(QIODevice::ReadOnly|QIODevice::Truncate|QIODevice::Text)){
-            CodeLibrary::display_msg_dialog("Error","Something went wrong.");
-        }
-
-        QTextStream file_data_out(&file);
-
-        QTextEdit * txt_edit = m_main_window->getTextEdit();
-
-        if(txt_edit){
-            file_data_out<<txt_edit->toPlainText();
-            file.close();
-        }
-        curr_file_path = file_path;//updating the new file path
-        m_main_window->setWindowTitle(QFileInfo(file_path).fileName());
+    if(file_path.isEmpty()){
+        CodeLibrary::display_msg_dialog("Error","Something went wrong.");
+        return;
     }
+    QFile file(file_path);
+    if(!file.open(QIODevice::ReadOnly|QIODevice::Truncate|QIODevice::Text)){
+        CodeLibrary::display_msg_dialog("Error","Something went wrong.");
+        return;
+    }
+
+    QTextStream file_data_out(&file);
+
+    QTextEdit * txt_edit = m_main_window->getTextEdit();
+
+    if(txt_edit){
+        file_data_out<<txt_edit->toPlainText();
+        file.close();
+    }
+    curr_file_path = file_path;//updating the new file path
+    m_main_window->setWindowTitle(QFileInfo(file_path).fileName());
 }
 
 void CodeLibrary::open_document(){
     QString file_path = QFileDialog::getOpenFileName(m_main_window,"Open Document","C:/Documents", "*.txt");
-    if(!file_path.isEmpty()){
-        QFile file(file_path);
-        if(!file.open(QIODevice::ReadOnly|QIODevice::Text)){
-            CodeLibrary::display_msg_dialog("Error","Error opening file!");
-        }
-        QTextStream file_data(&file);
-        QString file_contents = file_data.readAll();
-        file.close();
+    if(file_path.isEmpty()){
+        CodeLibrary::display_msg_dialog("Error","Something went wrong!");
+        return;
+    }
 
-        QTextEdit * txt_edit = m_main_window->getTextEdit();
+    QFile file(file_path);
+    if(!file.open(QIODevice::ReadOnly|QIODevice::Text)){
+        CodeLibrary::display_msg_dialog("Error","Error opening file!");
+        return;
+    }
 
-        if(txt_edit){
-            txt_edit->setPlainText(file_contents);
-            m_main_window->setWindowTitle(QFileInfo(file_path).fileName());
-        }else {
-            CodeLibrary::display_msg_dialog("Error","Editor is uninitialized!");
-        }
+    QTextStream file_data(&file);
+    QString file_contents = file_data.readAll();
+    file.close();
+
+    QTextEdit * txt_edit = m_main_window->getTextEdit();
+
+    if(txt_edit){
+        txt_edit->setPlainText(file_contents);
+        m_main_window->setWindowTitle(QFileInfo(file_path).fileName());
+    }else {
+        CodeLibrary::display_msg_dialog("Error","Editor is uninitialized!");
     }
 }
 

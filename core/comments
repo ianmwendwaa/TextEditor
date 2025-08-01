@@ -1,0 +1,13 @@
+//initializing the toolbar
+tool_bar = addToolBar("Toolbar");
+
+//save icon fot the toolbar
+save = new QAction(QIcon::fromTheme("document-save", QIcon(":/icon.png")),"Save",this);
+
+//open icon
+open = new QAction(QIcon::fromTheme("document-open", QIcon(":/icon.png")),"Open",this);
+
+//adding the icons to the toolbar
+tool_bar->addAction(save);
+tool_bar->addAction(open);
+

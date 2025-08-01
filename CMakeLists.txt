@@ -12,6 +12,7 @@ qt_add_executable(TextEditor
     mainwindow.h
     mainwindow.ui
     codelibrary.h codelibrary.cpp
+    comments
 )
 
 target_link_libraries(TextEditor
