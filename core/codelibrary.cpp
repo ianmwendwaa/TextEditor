@@ -17,6 +17,7 @@
 #include <QTextStream>
 #include <QToolBar>
 
+//menu actions
 enum ActionTypes{
     NEW, SAVE, SAVE_AS, OPEN,
     EXIT, UNDO, REDO, PASTE,
@@ -191,9 +192,11 @@ void CodeLibrary::toggle_bold(){
 
     QTextCharFormat fmt;
 
+    //if the current font weight is greater than normal, pass the weight to be normal
     if(currWeight > QFont::Normal){
         fmt.setFontWeight(QFont::Normal);
     }else{
+        //otherwise bold the text
         fmt.setFontWeight(QFont::Bold);
     }
 
@@ -238,8 +241,6 @@ void CodeLibrary::new_document(){
 
             new_window->setAttribute(Qt::WA_DeleteOnClose);
             new_window->show();
-            /*  TODO: I need to implement a more elaborative approach on this
-     a system where a new window with a new text edit appears*/
         }
     }
 }
