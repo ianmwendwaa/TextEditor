@@ -4,6 +4,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QFile>
+#include <QLabel>
+#include <QRegularExpression>
 #include <QTextEdit>
 #include <QApplication>
 
@@ -17,11 +19,12 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
 
     setCentralWidget(edit_text);
     showMaximized();
-    // setStyleSheet("background: white;"
-    //               " color:black");
+    setStyleSheet("background: #f4f4f4;"
+                  "color:black");
 
     edit_text->setStyleSheet("background: transparent;"
                              "border-color: black");
+
 
     //<------------------File menu------------------->
     file_menu = menu_bar->addMenu("&File");
@@ -59,11 +62,35 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
     //redo operation
     redo_action = code_lib->action_handler(edit_menu,"&Redo","Redo");
 
+    //<------------------Font menu---------------------------->
+    font_menu = menu_bar->addMenu("&Font");
+
     //increase font operation
-    increase_font = code_lib->action_handler(edit_menu,"&Increase Font Size","Increase Font");
+    increase_font = code_lib->action_handler(font_menu,"&Increase Font Size","Increase Font");
 
     //decrease font operation
-    decrease_font = code_lib->action_handler(edit_menu,"&Decrease Font Size","Decrease Font");
+    decrease_font = code_lib->action_handler(font_menu,"&Decrease Font Size","Decrease Font");
+
+    //italicize font
+    italicize_font = code_lib->action_handler(font_menu,"&Italics","Italics");
+
+    //bold font
+    bold_font = code_lib->action_handler(font_menu,"&Bold", "Bold");
+
+    //underline font
+    underline_font = code_lib->action_handler(font_menu,"&Underline","Underline");
+
+    //left alignment
+    left_alignment = code_lib->action_handler(font_menu, "&Left Alignment","Left");
+
+    //left alignment
+    right_alignment = code_lib->action_handler(font_menu, "&Right Alignment","Right");
+
+    //left alignment
+    center_alignment = code_lib->action_handler(font_menu, "&Center Alignment","Center");
+
+    //left alignment
+    justify_alignment = code_lib->action_handler(font_menu, "&Justified Alignment","Justify");
 
     //<---------------------Page Menu----------------------->
     page_menu = menu_bar->addMenu("&Page");
@@ -79,10 +106,30 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
 
     //info popup
     info = code_lib->action_handler(about_menu,"&Info","Info");
+
+    QToolBar * bottomToolBar = addToolBar("Status bar");
+    bottomToolBar->setMovable(false);
+    bottomToolBar->setFloatable(false);
+    addToolBar(Qt::BottomToolBarArea, bottomToolBar);
+
+    word_counter_lbl = new QLabel("Words: ", this);
+    bottomToolBar->addWidget(word_counter_lbl);
 }
 
 QTextEdit *MainWindow::getTextEdit() const{
     return edit_text;
+}
+
+void MainWindow::word_counter()
+{
+    if(edit_text && word_counter_lbl){
+        QString text = edit_text->toPlainText();
+        static QRegularExpression separator("\\s+");
+        QStringList words = text.split(separator, Qt::SkipEmptyParts);
+
+        int num_words = words.size();
+        word_counter_lbl->setText(QString("Words: %1").arg(num_words));
+    }
 }
 
 

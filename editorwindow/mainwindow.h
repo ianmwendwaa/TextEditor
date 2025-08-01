@@ -7,6 +7,7 @@
 #include <QMenuBar>
 #include <QMenu>
 #include <QTextEdit>
+#include <QLineEdit>
 #include <QFile>
 #include <QTextStream>
 #include <QMessageBox>
@@ -38,9 +39,11 @@ private:
     QToolBar * tool_bar;
 
     QTextEdit * edit_text;
+    QLineEdit * font_edt;
 
     QMenu * file_menu;//file menu
     QMenu * edit_menu;//edit menu
+    QMenu * font_menu;
     QMenu * page_menu;
     QMenu * about_menu;//about menu
 
@@ -57,14 +60,22 @@ private:
     QAction * redo_action;
     QAction * increase_font;
     QAction * decrease_font;
+    QAction * bold_font;
+    QAction * italicize_font;
+    QAction * underline_font;
+    QAction * left_alignment;
+    QAction * right_alignment;
+    QAction * center_alignment;
+    QAction * justify_alignment;
     QAction * paste_action;
     QAction * open_action;
     QAction * open;
     QAction * print_action;
     QAction * page_setup;
     QAction * exit_program;
-
     QAction * info;
+
+    QLabel * word_counter_lbl;
 
     QString m_currentFilePath;//this one will store the current path for the current document'
 
@@ -79,6 +90,9 @@ private:
     void undo_text();
 
     void show_info();
+
+    void onFontDefFinished();
+    void word_counter();
 
 
 };

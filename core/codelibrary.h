@@ -37,6 +37,11 @@ public slots:
     void toggle_italics();
     void toggle_bold();
     void toggle_underline();
+
+    void toggle_alignments(Qt::Alignment alignment);
+
+    void word_counter();
+
 private:
     MainWindow * m_main_window;
     QTextEdit * txt_edit = nullptr;

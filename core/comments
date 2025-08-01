@@ -1,5 +1,4 @@
-//initializing the toolbar
-tool_bar = addToolBar("Toolbar");
+
 
 //save icon fot the toolbar
 save = new QAction(QIcon::fromTheme("document-save", QIcon(":/icon.png")),"Save",this);

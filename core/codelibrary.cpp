@@ -19,7 +19,10 @@ enum ActionTypes{
     NEW, SAVE, SAVE_AS, OPEN,
     EXIT, UNDO, REDO, PASTE,
     CUT, COPY, PRINT, PAGE_SETUP,
-    ABOUT, INFO, INCREASE_FNT_SZ, DECREASE_FNT_SZ, ITALICS, BOLD, UNDERLINE, UNKNOWN_CMD
+    ABOUT, INFO, INCREASE_FNT_SZ,DECREASE_FNT_SZ,
+    ITALICS, BOLD, UNDERLINE,
+    CENTER_ALIGNMENT, LEFT_ALIGNMENT, RIGHT_ALIGNMENT,
+    JUSTIFIED_ALIGNMENT, UNKNOWN_CMD
 };
 
 //results from process execution
@@ -49,7 +52,9 @@ QAction* CodeLibrary::action_handler(QMenu * menu_bar, const QString &menu_item,
         {"Paste", PASTE},{"Cut", CUT},{"Copy", COPY},{"Print",PRINT},
         {"Page Setup", PAGE_SETUP},{"About", ABOUT},{"Info", INFO},
         {"Increase Font", INCREASE_FNT_SZ},{"Decrease Font", DECREASE_FNT_SZ},
-        {"Italics", ITALICS},{"Bold", BOLD},{"Underline", UNDERLINE}};
+        {"Italics", ITALICS},{"Bold", BOLD},{"Underline", UNDERLINE},
+        {"Center", CENTER_ALIGNMENT},{"Left", LEFT_ALIGNMENT},{"Right", RIGHT_ALIGNMENT},
+        {"Justify", JUSTIFIED_ALIGNMENT}};
 
     QString menu_input = status_tip;
     ActionTypes cmd = UNKNOWN_CMD;
@@ -116,9 +121,30 @@ QAction* CodeLibrary::action_handler(QMenu * menu_bar, const QString &menu_item,
     case ITALICS:
         action->setShortcut(QKeySequence("CTRL+I"));
         QObject::connect(action, &QAction::triggered, this, &CodeLibrary::toggle_italics);
+        break;
     case BOLD:
         action->setShortcut(QKeySequence("CTRL+B"));
         QObject::connect(action, &QAction::triggered, this, &CodeLibrary::toggle_bold);
+        break;
+    case UNDERLINE:
+        action->setShortcut(QKeySequence("CTRL+U"));
+        QObject::connect(action, &QAction::triggered, this, &CodeLibrary::toggle_underline);
+        break;
+    case CENTER_ALIGNMENT:
+        action->setShortcut(QKeySequence("CTRL+E"));
+        QObject::connect(action, &QAction::triggered, this, [this](){CodeLibrary::toggle_alignments(Qt::AlignCenter);});
+        break;
+    case LEFT_ALIGNMENT:
+        action->setShortcut(QKeySequence("CTRL+L"));
+        QObject::connect(action, &QAction::triggered, this, [this](){CodeLibrary::toggle_alignments(Qt::AlignLeft);});
+        break;
+    case RIGHT_ALIGNMENT:
+        action->setShortcut(QKeySequence("CTRL+R"));
+        QObject::connect(action, &QAction::triggered, this, [this](){CodeLibrary::toggle_alignments(Qt::AlignRight);});
+        break;
+    case JUSTIFIED_ALIGNMENT:
+        action->setShortcut(QKeySequence("CTRL+J"));
+        QObject::connect(action, &QAction::triggered, this, [this](){CodeLibrary::toggle_alignments(Qt::AlignJustify);});
     default:
         break;
     }
@@ -172,6 +198,11 @@ void CodeLibrary::toggle_bold(){
     QTextCursor cursor = txt_edit->textCursor();
     cursor.mergeCharFormat(fmt);
     txt_edit->mergeCurrentCharFormat(fmt);
+}
+
+void CodeLibrary::toggle_alignments(Qt::Alignment alignment){
+    QTextEdit * txt_edit = m_main_window->getTextEdit();
+    txt_edit->setAlignment(alignment);
 }
 
 void CodeLibrary::toggle_underline(){
