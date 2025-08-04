@@ -11,7 +11,6 @@
 #include <QObject>
 #include <QString>
 #include <QTextEdit>
-#include <QTextListFormat>
 #include <QTextStream>
 #include <QToolBar>
 
@@ -24,12 +23,11 @@ public:
     explicit CodeLibrary(QObject * parent = nullptr, MainWindow * main_window = nullptr);
     void display_msg_dialog(const QString &event_result,const QString &dialog_msg);
     QAction* action_handler(QMenu * menu_bar, const QString &menu_item, const QString&status_tip);
-    QString * getStatusTip()const;
 
 public slots:
     void new_document();
     bool save_document();
-    bool save_document_as();
+    void save_document_as();
     void open_document();
     void show_info();
     void page_setup();
@@ -37,7 +35,6 @@ public slots:
 
     void increase_font();
     void decrease_font();
-    void toggle_bullets();
     void toggle_italics();
     void toggle_bold();
     void toggle_underline();
