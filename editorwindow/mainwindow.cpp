@@ -17,7 +17,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
     code_lib = new CodeLibrary(this,this);
 
     edit_text = new QTextEdit();
-    // edit_text->setFixedWidth(700);
 
     //the font was too small by default so i had to manually increase it
     QFont sth = edit_text->font();
@@ -78,6 +77,9 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
 
     //decrease font operation
     decrease_font = code_lib->action_handler(font_menu,"&Decrease Font Size","Decrease Font");
+
+    //bullets
+    bullets = code_lib->action_handler(font_menu, "&Numeric bullets","Bullets");
 
     //italicize font
     italicize_font = code_lib->action_handler(font_menu,"&Italics","Italics");
@@ -160,4 +162,3 @@ void MainWindow::closeEvent(QCloseEvent *closeEvent){
         closeEvent->ignore();
     }
 }
-

@@ -13,7 +13,9 @@
 #include <QMessageBox>
 #include <QRegularExpression>
 #include <QString>
+#include <QTextCursor>
 #include <QTextEdit>
+#include <QTextList>
 #include <QTextStream>
 #include <QToolBar>
 
@@ -22,10 +24,11 @@ enum ActionTypes{
     NEW, SAVE, SAVE_AS, OPEN,
     EXIT, UNDO, REDO, PASTE,
     CUT, COPY, PRINT, PAGE_SETUP,
-    ABOUT, INFO, INCREASE_FNT_SZ,DECREASE_FNT_SZ,
-    ITALICS, BOLD, UNDERLINE,
-    CENTER_ALIGNMENT, LEFT_ALIGNMENT, RIGHT_ALIGNMENT,
-    JUSTIFIED_ALIGNMENT, UNKNOWN_CMD
+    ABOUT, INFO, INCREASE_FNT_SZ, DECREASE_FNT_SZ,
+    NUM_BULLETS, DOT_BULLETS, SQR_BULLETS,
+    RING_BULLETS, ITALICS, BOLD, UNDERLINE,
+    CENTER_ALIGNMENT, LEFT_ALIGNMENT,
+    RIGHT_ALIGNMENT, JUSTIFIED_ALIGNMENT, UNKNOWN_CMD
 };
 
 //results from process execution
@@ -42,7 +45,6 @@ CodeLibrary::CodeLibrary(QObject * parent, MainWindow * main_window): QObject(pa
     }else{
         qWarning()<<"Null Window!";
     }
-
 }
 
 QAction* CodeLibrary::action_handler(QMenu * menu_bar, const QString &menu_item, const QString &status_tip){
@@ -55,6 +57,8 @@ QAction* CodeLibrary::action_handler(QMenu * menu_bar, const QString &menu_item,
                                                      {"Paste", PASTE},{"Cut", CUT},{"Copy", COPY},{"Print",PRINT},
                                                      {"Page Setup", PAGE_SETUP},{"About", ABOUT},{"Info", INFO},
                                                      {"Increase Font", INCREASE_FNT_SZ},{"Decrease Font", DECREASE_FNT_SZ},
+                                                     {"Bullets", NUM_BULLETS},{"Dot Bullets",DOT_BULLETS},
+                                                     {"Ring Bullets", RING_BULLETS},{"Square Bullets", SQR_BULLETS},
                                                      {"Italics", ITALICS},{"Bold", BOLD},{"Underline", UNDERLINE},
                                                      {"Center", CENTER_ALIGNMENT},{"Left", LEFT_ALIGNMENT},{"Right", RIGHT_ALIGNMENT},
                                                      {"Justify", JUSTIFIED_ALIGNMENT}};
@@ -121,6 +125,10 @@ QAction* CodeLibrary::action_handler(QMenu * menu_bar, const QString &menu_item,
         action->setShortcut(QKeySequence("CTRL+-"));
         QObject::connect(action, &QAction::triggered, this, &CodeLibrary::decrease_font);
         break;
+    case NUM_BULLETS:
+        action->setShortcut(QKeySequence("CTRL+Q"));
+        QObject::connect(action, &QAction::triggered, this, &CodeLibrary::toggle_bullets);
+        break;
     case ITALICS:
         action->setShortcut(QKeySequence("CTRL+I"));
         QObject::connect(action, &QAction::triggered, this, &CodeLibrary::toggle_italics);
@@ -161,7 +169,6 @@ void CodeLibrary::increase_font(){
     int curr_size = font.pointSize();
     font.setPointSize(curr_size+1);
     txt_edit->setFont(font);
-
 }
 
 void CodeLibrary::decrease_font(){
@@ -171,6 +178,35 @@ void CodeLibrary::decrease_font(){
     int curr_size = font.pointSize();
     font.setPointSize(curr_size-1);
     txt_edit->setFont(font);
+}
+
+void CodeLibrary::toggle_bullets(){
+
+    QTextCursor cursor = m_main_window->getTextEdit()->textCursor();
+
+    QTextList * curr_list = cursor.currentList();
+
+    if(curr_list){
+        QTextBlockFormat block_fmt;
+        block_fmt.setIndent(0);//reset the indentation
+        block_fmt.setObjectIndex(0);
+
+        cursor.beginEditBlock();
+        cursor.setBlockFormat(block_fmt);
+        cursor.endEditBlock();
+    }else{
+        //else if it is not a list, create a bullet list
+        QTextBlockFormat block_fmt = cursor.blockFormat();
+
+        //creating a format for the bullet list
+        QTextListFormat list_fmt;
+        list_fmt.setStyle(QTextListFormat::ListDecimal);
+
+        int indent = block_fmt.indent() + 1;//setting indentation for the list
+        list_fmt.setIndent(indent);
+
+        cursor.createList(list_fmt);
+    }
 }
 
 void CodeLibrary::toggle_italics(){
@@ -236,7 +272,7 @@ void CodeLibrary::new_document(){
     if(m_main_window){
         QTextEdit * txt_edit = m_main_window->getTextEdit();
         if(txt_edit){
-            txt_edit->clear();
+            // txt_edit->clear();
             MainWindow * new_window = new MainWindow();
 
             new_window->setAttribute(Qt::WA_DeleteOnClose);
@@ -245,13 +281,30 @@ void CodeLibrary::new_document(){
     }
 }
 
-void CodeLibrary::save_document_as(){
+bool CodeLibrary::save_document_as(){
     QString file_path = QFileDialog::getSaveFileName(m_main_window,"Save Document","C:/Documents","*.txt");
 
     if(file_path.isEmpty()){
         CodeLibrary::display_msg_dialog("Error","Something went wrong.");
+        return false;
     }
     QFile file(file_path);
+
+    if(file.exists()){
+        QMessageBox::StandardButton save_reply= QMessageBox::question(
+            m_main_window,"Save Watcher",
+            "A previous version of this document exists. Do you want to overwrite it?",
+            QMessageBox::Yes|QMessageBox::No);
+        switch (save_reply) {
+        case QMessageBox::Yes:
+            CodeLibrary::save_document();
+            break;
+        case QMessageBox::No:
+            return false;
+        default:
+            break;
+        }
+    }
     if(!file.open(QIODevice::ReadOnly|QIODevice::Truncate|QIODevice::Text)){
         CodeLibrary::display_msg_dialog("Error","Something went wrong.");
     }
@@ -266,6 +319,7 @@ void CodeLibrary::save_document_as(){
     }
     curr_file_path = file_path;//updating the new file path
     m_main_window->setWindowTitle(QFileInfo(file_path).fileName());
+    return true;
 }
 
 void CodeLibrary::open_document(){

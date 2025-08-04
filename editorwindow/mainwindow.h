@@ -15,8 +15,6 @@
 #include <QTextStream>
 #include <QToolBar>
 
-
-
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -37,7 +35,6 @@ private:
 
     CodeLibrary * code_lib;
 
-
     QMenuBar * menu_bar;//main menu bar
 
     QToolBar * tool_bar;
@@ -51,8 +48,6 @@ private:
     QMenu * page_menu;
     QMenu * about_menu;//about menu
 
-
-
     //self explanatory actions
     QAction * new_action;
     QAction * save_action;
@@ -64,6 +59,7 @@ private:
     QAction * redo_action;
     QAction * increase_font;
     QAction * decrease_font;
+    QAction * bullets;
     QAction * bold_font;
     QAction * italicize_font;
     QAction * underline_font;
@@ -81,28 +77,13 @@ private:
 
     QLabel * word_counter_lbl;
 
-    QString m_currentFilePath;//this one will store the current path for the current document'
+    QString m_currentFilePath;//this one will store the current path for the current document
 
-    void action_func(QMenu * menu, QAction *action, const QString &menu_ation_name, const QString &status_tip);
-
-    void new_document();
-    void open_document();
-
-    void save_document();
-    void save_document_as();
-
-    void undo_text();
-
-    void show_info();
-
-    void onFontDefFinished();
     void word_counter();
 private slots:
     bool isSaved();
 
 protected:
     void closeEvent(QCloseEvent * closeEvent)override;
-
-
 };
 #endif // MAINWINDOW_H
