@@ -26,11 +26,12 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent){
 
     setCentralWidget(edit_text);
     showMaximized();
-    // setStyleSheet("background: #f4f4f4;"
-    //               "color:black");
+    setStyleSheet("background: #f4f4f4;"
+                  "color:black");
 
     edit_text->setStyleSheet("background: transparent;"
-                             "border-color: black");
+                             "border-color: black;"
+                             "border-style: solid;");
 
 
     //<------------------File menu------------------->
@@ -138,9 +139,11 @@ QLabel *MainWindow::getWordCounter() const{
 bool MainWindow::isSaved()
 {
     if(this->getTextEdit()->document()->isModified()){
-        QMessageBox::StandardButton action = QMessageBox::warning(this,
-                                                                  "Text Editor:Save Watcher","There have been modifications to your document. "
-                                                                  "Do you want to save your document?",QMessageBox::Save|QMessageBox::Cancel|QMessageBox::Discard);
+        QMessageBox::StandardButton action = QMessageBox::warning(
+            this,
+            "Text Editor:Save Watcher","There have been modifications to your document. "
+            "Do you want to save your document?",
+            QMessageBox::Save|QMessageBox::Cancel|QMessageBox::Discard);
 
         switch (action) {
         case QMessageBox::Save:
