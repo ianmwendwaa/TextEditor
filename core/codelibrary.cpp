@@ -257,8 +257,8 @@ void CodeLibrary::word_counter(){
 }
 
 void CodeLibrary::toggle_underline(){
-    bool isUnderlined = txt_edit->fontUnderline();
     QTextEdit * txt_edit = m_main_window->getTextEdit();
+    bool isUnderlined = txt_edit->fontUnderline();
 
     QTextCharFormat fmt;
     fmt.setFontUnderline(!isUnderlined);
@@ -285,7 +285,6 @@ bool CodeLibrary::save_document_as(){
     QString file_path = QFileDialog::getSaveFileName(m_main_window,"Save Document","C:/Documents","*.txt");
 
     if(file_path.isEmpty()){
-        CodeLibrary::display_msg_dialog("Error","Something went wrong.");
         return false;
     }
     QFile file(file_path);
@@ -323,9 +322,8 @@ bool CodeLibrary::save_document_as(){
 }
 
 void CodeLibrary::open_document(){
-    QString file_path = QFileDialog::getOpenFileName(m_main_window,"Open Document","C:/Documents", "*.txt");
+    QString file_path = QFileDialog::getOpenFileName(m_main_window,"Open Document","C:/Users/Owner/Documents", "*.txt");
     if(file_path.isEmpty()){
-        CodeLibrary::display_msg_dialog("Error","Something went wrong!");
         return;
     }
 
@@ -351,27 +349,24 @@ void CodeLibrary::open_document(){
 
 
 bool CodeLibrary::save_document(){
-    QString file_path = QFileDialog::getSaveFileName(m_main_window, "Save Document","C:/Documents","*.txt");
-
+    QString file_path = QFileDialog::getSaveFileName(m_main_window, "Save Document","C:/Users/Owner/Documents","*.txt");
     if(file_path.isEmpty()){
-        CodeLibrary::display_msg_dialog("Error","Provide a title");
         return false;
     }
 
     QFile file(file_path);
 
-    if(!file.open(QIODevice::Text|QIODevice::WriteOnly|QIODevice::Truncate)){
-        CodeLibrary::display_msg_dialog("Error","Something wrong occurred. Try again later!");
-        return false;
-    }
+    if(file.open(QIODevice::Text|QIODevice::WriteOnly|QIODevice::Truncate)){
 
-    QTextStream file_data(&file);
+        QTextStream file_data(&file);
 
-    QTextEdit * txt_edit = m_main_window->getTextEdit();
-    if(txt_edit){
-        file_data<<txt_edit->toPlainText();
-        file.close();
-    }
+        QTextEdit * txt_edit = m_main_window->getTextEdit();
+        if(txt_edit){
+            file_data<<txt_edit->toPlainText();
+            file.close();
+        }
+    }return false;
+
     m_main_window->setWindowTitle(QFileInfo(file_path).fileName());
     return true;
 }
