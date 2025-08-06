@@ -42,11 +42,11 @@ private:
     QTextEdit * edit_text;
     QLineEdit * font_edt;
 
-    QMenu * file_menu;//file menu
-    QMenu * edit_menu;//edit menu
+    QMenu * file_menu;
+    QMenu * edit_menu;
     QMenu * font_menu;
     QMenu * page_menu;
-    QMenu * about_menu;//about menu
+    QMenu * about_menu;
 
     //self explanatory actions
     QAction * new_action;
